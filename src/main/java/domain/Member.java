@@ -32,7 +32,7 @@ public class Member {
     @Column(name = "member_role", nullable = false)
     private MemberRole memberRole;
 
-    @Column(name = "address_id")
+    @Column(name = "address_id", nullable = false)
     private Long addressId;
 
     public Member() {

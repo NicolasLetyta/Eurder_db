@@ -24,11 +24,10 @@ public class MemberMapper {
     }
 
     public MemberDtoOutput memberToOutput(Member member, Address address) {
-        AddressDtoOutput addressDto = address == null ? null : addressMapper.addressToOutput(address);
         return new MemberDtoOutput(member.getId(),
                 member.getFullName(),
                 member.getEmail(),
                 member.getMemberRole(),
-                addressDto);
+                addressMapper.addressToOutput(address));
     }
 }
