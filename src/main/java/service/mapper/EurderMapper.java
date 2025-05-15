@@ -26,7 +26,7 @@ public class EurderMapper {
                 eurder.calculateEurderPrice());
     }
 
-    public EurderDtoOutput EurderToOutputFinalized(Eurder eurder, String memberName) {
+    public EurderDtoOutput eurderToOutputFinalized(Eurder eurder, String memberName) {
         List<ItemGroupDtoOutput> itemGroupDtoOutputList = eurder.getItemGroups().stream()
                 .map(i->itemGroupMapper.itemGroupToOutputFinalized(i))
                 .toList();
@@ -38,7 +38,7 @@ public class EurderMapper {
                 eurder.calculateEurderPriceFinalized());
     }
 
-    public EurderDtoOutput EurderToDtoReport(Eurder eurder) {
+    public EurderDtoOutput eurderToDtoReport(Eurder eurder) {
         List<ItemGroupDtoOutput> itemGroupsDtoFinalized = eurder.getItemGroups().stream()
                 .map(i->itemGroupMapper.itemGroupToDtoReport(i))
                 .toList();

@@ -41,8 +41,9 @@ public class EurderService {
     }
 
     public EurderDtoOutput addItemGroupToCart(ItemGroupDtoInput itemGroupDtoInput, Member member) {
+        validateItemGroupInput(itemGroupDtoInput);
         String fullName = member.getFullName();
-        Item item = itemRepository.findById(itemGroupDtoInput.getItemId()).orElseThrow(()->new InvalidInputException("Item id not found in repository"));
+        Item item = itemRepository.findById(itemGroupDtoInput.getItemId()).get();
         Eurder cart = createOrGetCart(member.getId());
 
         ItemGroup itemGroup = itemGroupMapper.inputToItemGroup(itemGroupDtoInput,
@@ -50,10 +51,6 @@ public class EurderService {
                 cart);
 
         cart.addItemGroup(itemGroup);
-
-        item.setStock(item.getStock()-itemGroup.getQuantity());
-        itemRepository.save(item);
-
         cart = eurderRepository.save(cart);
         return eurderMapper.eurderToOutputCart(cart,fullName);
     }
@@ -70,6 +67,8 @@ public class EurderService {
                             .mapToInt(ItemGroup::getQuantity)
                             .sum();                      // total order quantity per item in this eurder
 
+                    item.setStock(item.getStock()-totalOrderQuantity);
+                    itemRepository.save(item);
                     LocalDate shipDate = calculateShippingDate(item,totalOrderQuantity,LocalDate.now());
                     groups.forEach(g -> g.setTotalPriceAtEurderDate(g.calculateCurrentSubtotalPrice()));//set the total itemgroup price at shipping date to todays prices
                     groups.forEach(g -> g.setShippingDate(shipDate));  // for each group set date according to total
@@ -77,12 +76,12 @@ public class EurderService {
                 });
 
         eurder.setStatusFinalized();
-        return eurderMapper.EurderToOutputFinalized(eurderRepository.save(eurder),member.getFullName());
+        return eurderMapper.eurderToOutputFinalized(eurderRepository.save(eurder),member.getFullName());
     }
 
     public EurderReport getEurderReport(Long memberId) {
         List<EurderDtoOutput> eurderDtoList = eurderRepository.findAllByMemberIdAndStatus(memberId,EurderStatus.FINALIZED).stream()
-                .map(eurderMapper::EurderToDtoReport)
+                .map(eurderMapper::eurderToDtoReport)
                 .toList();
         double totalPrice = eurderDtoList.stream()
                 .mapToDouble(EurderDtoOutput::getTotalPrice)
@@ -98,6 +97,12 @@ public class EurderService {
                 newEurder)));
         return finalizeEurder(newEurder.getId(),member);
     }
+
+    private void validateItemGroupInput(ItemGroupDtoInput itemGroupDtoInput) {
+        validateArgument(itemGroupDtoInput.getItemId(),"Item id not found in repository", i->!itemRepository.existsById(i),InvalidInputException::new);
+        validateArgument(itemGroupDtoInput.getQuantity(),"Order quantity must be larger than 0", q->q<=0,InvalidInputException::new);
+    }
+
 
     private Eurder createOrGetCart(Long memberId) {
         Optional<Eurder> cart = eurderRepository.findByMemberIdAndStatus(memberId, EurderStatus.CART);
