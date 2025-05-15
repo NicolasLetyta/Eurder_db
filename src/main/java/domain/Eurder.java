@@ -24,19 +24,21 @@ public class Eurder{
     @Column(name = "status")
     private EurderStatus status;
 
-    @Transient
-    private double eurderPrice;
-
     public Eurder() {
     }
     public Eurder(Long memberId) {
         this.memberId = memberId;
     }
 
-    @PreUpdate //each time an existing row gets persisted, the shipping price will be calculated.
-    private void calculateEurderPrice() {
-        this.eurderPrice = this.itemGroups.stream()
+    public double calculateEurderPrice() {
+       return this.itemGroups.stream()
                 .mapToDouble(ItemGroup::calculateCurrentSubtotalPrice)
+                .sum();
+    }
+
+    public double calculateEurderPriceFinalized() {
+        return this.getItemGroups().stream()
+                .mapToDouble(ItemGroup::getTotalPriceAtEurderDate)
                 .sum();
     }
 
@@ -53,9 +55,6 @@ public class Eurder{
     }
     public EurderStatus getStatus() {
         return status;
-    }
-    public double getEurderPrice() {
-        return eurderPrice;
     }
 
     public void setStatusFinalized() {
@@ -83,7 +82,7 @@ public class Eurder{
 
     @Override
     public String toString() {
-        return this.id+"\n"+this.itemGroups+"\n"+this.eurderPrice+" "+this.status;
+        return this.id+"\n"+this.itemGroups+"\n"+calculateEurderPrice()+" "+this.status;
     }
     @Override
     public boolean equals(Object o) {

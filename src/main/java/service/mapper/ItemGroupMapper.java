@@ -18,7 +18,7 @@ public class ItemGroupMapper {
                 eurder);
     }
 
-    public ItemGroupDtoOutput itemGroupToOutput(ItemGroup itemGroup) {
+    public ItemGroupDtoOutput itemGroupToOutputCart(ItemGroup itemGroup) {
         return new ItemGroupDtoOutput(itemGroup.getId(),
                 itemGroup.getItem().getName(),
                 itemGroup.getItem().getDescription(),
@@ -27,12 +27,21 @@ public class ItemGroupMapper {
                 itemGroup.getEurder().getId());
     }
 
-    public ItemGroupDtoOutput itemGroupToDtoList(ItemGroup itemGroup) {
+    public ItemGroupDtoOutput itemGroupToOutputFinalized(ItemGroup itemGroup) {
+        return new ItemGroupDtoOutput(itemGroup.getId(),
+                itemGroup.getItem().getName(),
+                itemGroup.getItem().getDescription(),
+                itemGroup.getQuantity(),
+                itemGroup.getTotalPriceAtEurderDate(),
+                itemGroup.getEurder().getId());
+    }
+
+    public ItemGroupDtoOutput itemGroupToDtoReport(ItemGroup itemGroup) {
         return new ItemGroupDtoOutput(null,
                 itemGroup.getItem().getName(),
                 null,
                 itemGroup.getQuantity(),
-                itemGroup.calculateCurrentSubtotalPrice(),
+                itemGroup.getTotalPriceAtEurderDate(),
                 null);
     }
 }

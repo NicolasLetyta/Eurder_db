@@ -3,11 +3,9 @@ package service.mapper;
 import domain.Eurder;
 import org.springframework.stereotype.Component;
 import webapi.dto.EurderDtoOutput;
-import webapi.dto.EurderReport;
 import webapi.dto.ItemGroupDtoOutput;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class EurderMapper {
@@ -16,28 +14,43 @@ public class EurderMapper {
         this.itemGroupMapper = itemGroupMapper;
     }
 
-    public EurderDtoOutput EurderToOutput(Eurder eurder, String memberName) {
+    public EurderDtoOutput EurderToOutputCart(Eurder eurder, String memberName) {
         List<ItemGroupDtoOutput> itemGroupDtoOutputList = eurder.getItemGroups().stream()
-                .map(i->itemGroupMapper.itemGroupToOutput(i))
+                .map(i->itemGroupMapper.itemGroupToOutputCart(i))
                 .toList();
         return new EurderDtoOutput(eurder.getId(),
                 memberName,
                 eurder.getMemberId(),
                 eurder.getStatus().name(),
                 itemGroupDtoOutputList,
-                eurder.getEurderPrice());
+                eurder.calculateEurderPrice());
     }
 
-    public EurderDtoOutput EurderToDtoList(Eurder eurder) {
-        List<ItemGroupDtoOutput> itemGroupDtoList = eurder.getItemGroups().stream()
-                .map(i->itemGroupMapper.itemGroupToDtoList(i))
+    public EurderDtoOutput EurderToOutputFinalized(Eurder eurder, String memberName) {
+        List<ItemGroupDtoOutput> itemGroupDtoOutputList = eurder.getItemGroups().stream()
+                .map(i->itemGroupMapper.itemGroupToOutputFinalized(i))
                 .toList();
+        return new EurderDtoOutput(eurder.getId(),
+                memberName,
+                eurder.getMemberId(),
+                eurder.getStatus().name(),
+                itemGroupDtoOutputList,
+                eurder.calculateEurderPriceFinalized());
+    }
+
+    public EurderDtoOutput EurderToDtoReport(Eurder eurder) {
+        List<ItemGroupDtoOutput> itemGroupsDtoFinalized = eurder.getItemGroups().stream()
+                .map(i->itemGroupMapper.itemGroupToDtoReport(i))
+                .toList();
+        double totalEurderPriceFinalized = itemGroupsDtoFinalized.stream()
+                .mapToDouble(ItemGroupDtoOutput::getSubtotalPrice)
+                .sum();
         return new EurderDtoOutput(eurder.getId(),
                 null,
                 null,
                 null,
-                itemGroupDtoList,
-                eurder.getEurderPrice());
+                itemGroupsDtoFinalized,
+                totalEurderPriceFinalized);
     }
 
 }

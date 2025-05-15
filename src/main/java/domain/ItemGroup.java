@@ -24,6 +24,9 @@ public class ItemGroup {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
+    @Column(name = "total_price_eurder_date")
+    private double totalPriceAtEurderDate;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "eurder_id", nullable = false)
     private Eurder eurder;
@@ -54,6 +57,14 @@ public class ItemGroup {
 
     public Eurder getEurder() {
         return eurder;
+    }
+
+    public double getTotalPriceAtEurderDate() {
+        return totalPriceAtEurderDate;
+    }
+
+    public void setTotalPriceAtEurderDate(double totalPriceAtEurderDate) {
+        this.totalPriceAtEurderDate = totalPriceAtEurderDate;
     }
 
     public double calculateCurrentSubtotalPrice() {

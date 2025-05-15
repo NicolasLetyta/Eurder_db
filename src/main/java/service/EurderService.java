@@ -6,15 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import repository.EurderRepository;
 import repository.ItemRepository;
-import repository.MemberFullName;
 import repository.MemberRepository;
 import service.mapper.EurderMapper;
 import service.mapper.ItemGroupMapper;
-import service.mapper.ItemMapper;
 import webapi.dto.EurderDtoOutput;
 import webapi.dto.EurderReport;
 import webapi.dto.ItemGroupDtoInput;
-import webapi.dto.ItemGroupDtoOutput;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -52,7 +49,7 @@ public class EurderService {
 
         cart.addItemGroup(itemGroup);
         cart = eurderRepository.save(cart);
-        return eurderMapper.EurderToOutput(cart,fullName);
+        return eurderMapper.EurderToOutputCart(cart,fullName);
     }
 
     public EurderDtoOutput finalizeEurder(Member member){
@@ -66,18 +63,19 @@ public class EurderService {
                             .mapToInt(ItemGroup::getQuantity)
                             .sum();                      // total order quantity per item in this eurder
 
-                    LocalDate shipDate = calculateShippingDate(item,totalOrderQuantity,LocalDate.now());                      //
+                    LocalDate shipDate = calculateShippingDate(item,totalOrderQuantity,LocalDate.now());
+                    groups.forEach(g -> g.setTotalPriceAtEurderDate(g.getTotalPriceAtEurderDate()));//set the total itemgroup price at shipping date to todays prices
                     groups.forEach(g -> g.setShippingDate(shipDate));  // for each group set date according to total
                     //orderquantity for an item, not per itemGroup :)
                 });
 
         eurder.setStatusFinalized();
-        return eurderMapper.EurderToOutput(eurderRepository.save(eurder),member.getFullName());
+        return eurderMapper.EurderToOutputFinalized(eurderRepository.save(eurder),member.getFullName());
     }
 
     public EurderReport getEurderReport(Long memberId) {
         List<EurderDtoOutput> eurderDtoList = eurderRepository.findAllByMemberIdAndStatus(memberId,EurderStatus.FINALIZED).stream()
-                .map(eurderMapper::EurderToDtoList)
+                .map(eurderMapper::EurderToDtoReport)
                 .toList();
         double totalPrice = eurderDtoList.stream()
                 .mapToDouble(EurderDtoOutput::getTotalPrice)
