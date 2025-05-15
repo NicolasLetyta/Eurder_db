@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.CascadeType.ALL;
-
 @Entity
 @Table(name = "eurder")
 public class Eurder{
@@ -31,17 +29,14 @@ public class Eurder{
 
     public Eurder() {
     }
-    public Eurder(List<ItemGroup> itemGroups, Long memberId) {
-        this.itemGroups = itemGroups;
+    public Eurder(Long memberId) {
         this.memberId = memberId;
-        calculateEurderPrice();
     }
 
-    @PrePersist
-    @PreUpdate
+    @PreUpdate //each time an existing row gets persisted, the shipping price will be calculated.
     private void calculateEurderPrice() {
         this.eurderPrice = this.itemGroups.stream()
-                .mapToDouble(ItemGroup::getSubtotalPrice)
+                .mapToDouble(ItemGroup::calculateCurrentSubtotalPrice)
                 .sum();
     }
 
@@ -63,14 +58,27 @@ public class Eurder{
         return eurderPrice;
     }
 
+    public void setStatusFinalized() {
+        this.status = EurderStatus.FINALIZED;
+    }
+
     public ItemGroup addItemGroup(ItemGroup itemGroup) {
-        this.itemGroups.add(itemGroup);
-        return itemGroup;
+        if(this.status == EurderStatus.CART) {
+            this.itemGroups.add(itemGroup);
+            return itemGroup;
+        } else {
+            throw new IllegalArgumentException("Cannot add ItemGroup to finalized Eurder");
+        }
     }
 
     public List<ItemGroup> removeItemGroup(ItemGroup itemGroup) {
-        this.itemGroups.remove(itemGroup);
-        return this.itemGroups;
+        if(this.status == EurderStatus.CART) {
+            this.itemGroups.remove(itemGroup);
+            return this.itemGroups;
+        }else {
+            throw new IllegalArgumentException("Cannot remove ItemGroup from finalized Eurder");
+        }
+
     }
 
     @Override

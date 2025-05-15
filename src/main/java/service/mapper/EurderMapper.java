@@ -3,6 +3,7 @@ package service.mapper;
 import domain.Eurder;
 import org.springframework.stereotype.Component;
 import webapi.dto.EurderDtoOutput;
+import webapi.dto.EurderReport;
 import webapi.dto.ItemGroupDtoOutput;
 
 import java.util.List;
@@ -26,4 +27,17 @@ public class EurderMapper {
                 itemGroupDtoOutputList,
                 eurder.getEurderPrice());
     }
+
+    public EurderDtoOutput EurderToDtoList(Eurder eurder) {
+        List<ItemGroupDtoOutput> itemGroupDtoList = eurder.getItemGroups().stream()
+                .map(i->itemGroupMapper.itemGroupToDtoList(i))
+                .toList();
+        return new EurderDtoOutput(eurder.getId(),
+                null,
+                null,
+                null,
+                itemGroupDtoList,
+                eurder.getEurderPrice());
+    }
+
 }

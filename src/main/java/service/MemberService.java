@@ -6,6 +6,7 @@ import domain.MemberRole;
 import exception.InvalidInputException;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import repository.AddressRepository;
 import repository.MemberRepository;
 import service.mapper.AddressMapper;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import static utility.Validation.*;
 
 @Service
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;

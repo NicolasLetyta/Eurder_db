@@ -6,9 +6,9 @@ public class ItemGroupDtoOutput {
     private String itemDescription;
     private int quantity;
     private double subtotalPrice;
-    private long eurderId;
+    private Long eurderId;
 
-    public ItemGroupDtoOutput(Long id, String itemName, String itemDescription, int quantity, double subtotalPrice, long eurderId) {
+    public ItemGroupDtoOutput(Long id, String itemName, String itemDescription, int quantity, double subtotalPrice, Long eurderId) {
         this.id = id;
         this.itemName = itemName;
         this.itemDescription = itemDescription;
@@ -37,7 +37,7 @@ public class ItemGroupDtoOutput {
         return subtotalPrice;
     }
 
-    public long getEurderId() {
+    public Long getEurderId() {
         return eurderId;
     }
 

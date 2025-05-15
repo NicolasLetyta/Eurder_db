@@ -30,8 +30,7 @@ public class ItemGroup {
 
     public ItemGroup() {
     }
-    public ItemGroup(LocalDate shippingDate, int quantity, Item item, Eurder eurder) {
-        this.shippingDate = shippingDate;
+    public ItemGroup(int quantity, Item item, Eurder eurder) {
         this.quantity = quantity;
         this.item = item;
         this.eurder = eurder;
@@ -57,13 +56,17 @@ public class ItemGroup {
         return eurder;
     }
 
-    public double getSubtotalPrice() {
+    public double calculateCurrentSubtotalPrice() {
         return this.item.getPrice() * this.quantity;
+    }
+
+    public void setShippingDate(LocalDate shippingDate) {
+        this.shippingDate = shippingDate;
     }
 
     @Override
     public String toString() {
-        return this.item.getName() +" "+this.eurder.getId()+ " " + this.quantity + " " + this.shippingDate + " " + getSubtotalPrice();
+        return this.item.getName() +" "+this.eurder.getId()+ " " + this.quantity + " " + this.shippingDate + " " + calculateCurrentSubtotalPrice();
     }
     @Override
     public boolean equals(Object o) {
