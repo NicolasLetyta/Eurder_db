@@ -3,11 +3,13 @@ package service.mapper;
 import domain.Eurder;
 import domain.Item;
 import domain.ItemGroup;
+import org.springframework.stereotype.Component;
 import webapi.dto.ItemGroupDtoInput;
 import webapi.dto.ItemGroupDtoOutput;
 
 import java.time.LocalDate;
 
+@Component
 public class ItemGroupMapper {
 
     public ItemGroup inputToItemGroup(ItemGroupDtoInput itemGroupDtoInput,

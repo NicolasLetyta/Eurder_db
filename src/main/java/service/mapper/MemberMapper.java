@@ -3,10 +3,12 @@ package service.mapper;
 import domain.Address;
 import domain.Member;
 import domain.MemberRole;
+import org.springframework.stereotype.Component;
 import webapi.dto.AddressDtoOutput;
 import webapi.dto.MemberDtoInput;
 import webapi.dto.MemberDtoOutput;
 
+@Component
 public class MemberMapper {
     private AddressMapper addressMapper;
     public MemberMapper(AddressMapper addressMapper) {

@@ -1,9 +1,11 @@
 package service.mapper;
 
 import domain.Item;
+import org.springframework.stereotype.Component;
 import webapi.dto.ItemDtoInput;
 import webapi.dto.ItemDtoOutput;
 
+@Component
 public class ItemMapper {
 
     public Item inputToItem(ItemDtoInput itemDtoInput) {

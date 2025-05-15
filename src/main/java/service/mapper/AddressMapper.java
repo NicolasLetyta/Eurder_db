@@ -1,9 +1,11 @@
 package service.mapper;
 
 import domain.Address;
+import org.springframework.stereotype.Component;
 import webapi.dto.AddressDtoInput;
 import webapi.dto.AddressDtoOutput;
 
+@Component
 public class AddressMapper {
 
     public Address inputToAddress(AddressDtoInput addressDtoInput) {
