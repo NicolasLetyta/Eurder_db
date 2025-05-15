@@ -63,7 +63,7 @@ public class ItemGroup {
 
     @Override
     public String toString() {
-        return this.item.getName() +" - "+this.eurder.getId()+ " - " + this.quantity + " - " + this.shippingDate + " - " + getSubtotalPrice();
+        return this.item.getName() +" "+this.eurder.getId()+ " " + this.quantity + " " + this.shippingDate + " " + getSubtotalPrice();
     }
     @Override
     public boolean equals(Object o) {

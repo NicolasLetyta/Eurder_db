@@ -22,6 +22,10 @@ public class Eurder{
     @Column(name = "member_id")
     private Long memberId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private EurderStatus status;
+
     @Transient
     private double eurderPrice;
 
@@ -34,6 +38,7 @@ public class Eurder{
     }
 
     @PrePersist
+    @PreUpdate
     private void calculateEurderPrice() {
         this.eurderPrice = this.itemGroups.stream()
                 .mapToDouble(ItemGroup::getSubtotalPrice)
@@ -48,14 +53,29 @@ public class Eurder{
         return itemGroups;
     }
 
+    public Long getMemberId() {
+        return memberId;
+    }
+    public EurderStatus getStatus() {
+        return status;
+    }
+    public double getEurderPrice() {
+        return eurderPrice;
+    }
+
     public ItemGroup addItemGroup(ItemGroup itemGroup) {
         this.itemGroups.add(itemGroup);
         return itemGroup;
     }
 
+    public List<ItemGroup> removeItemGroup(ItemGroup itemGroup) {
+        this.itemGroups.remove(itemGroup);
+        return this.itemGroups;
+    }
+
     @Override
     public String toString() {
-        return this.id+"\n"+this.itemGroups+"\n"+this.eurderPrice;
+        return this.id+"\n"+this.itemGroups+"\n"+this.eurderPrice+" "+this.status;
     }
     @Override
     public boolean equals(Object o) {
