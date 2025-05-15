@@ -22,10 +22,10 @@ import static utility.Validation.*;
 
 @Service
 public class MemberService {
-    private MemberRepository memberRepository;
-    private MemberMapper memberMapper;
-    private AddressRepository addressRepository;
-    private AddressMapper addressMapper;
+    private final MemberRepository memberRepository;
+    private final MemberMapper memberMapper;
+    private final AddressRepository addressRepository;
+    private final AddressMapper addressMapper;
 
     private final String phoneRegex = "^\\+\\d{1,3}[-\\s()]*\\d{6,14}([-\\s()]*\\d{1,4})?$";
 

@@ -3,9 +3,9 @@ package webapi.dto;
 public class ItemDtoInput {
     private String name;
     private String description;
-    private double price;
-    private int stock;
-    public ItemDtoInput(String name, String description, double price, int stock) {
+    private Double price;
+    private Integer stock;
+    public ItemDtoInput(String name, String description, Double price, Integer stock) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -20,11 +20,11 @@ public class ItemDtoInput {
         return description;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public int getStock() {
+    public Integer getStock() {
         return stock;
     }
 }
