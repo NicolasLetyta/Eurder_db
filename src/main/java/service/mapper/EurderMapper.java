@@ -14,7 +14,7 @@ public class EurderMapper {
         this.itemGroupMapper = itemGroupMapper;
     }
 
-    public EurderDtoOutput EurderToOutputCart(Eurder eurder, String memberName) {
+    public EurderDtoOutput eurderToOutputCart(Eurder eurder, String memberName) {
         List<ItemGroupDtoOutput> itemGroupDtoOutputList = eurder.getItemGroups().stream()
                 .map(i->itemGroupMapper.itemGroupToOutputCart(i))
                 .toList();
