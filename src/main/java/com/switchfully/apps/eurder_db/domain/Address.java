@@ -1,6 +1,8 @@
 package com.switchfully.apps.eurder_db.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "address")
@@ -11,18 +13,22 @@ public class Address {
     private Long id;
 
     @Column(name = "street", nullable = false)
+    @NotNull
     private String street;
 
     @Column(name = "street_number")
     private String streetNumber;
 
     @Column(name = "postal_code", nullable = false)
+    @NotNull
     private String postalCode;
 
     @Column(name = "city", nullable = false)
+    @NotNull
     private String city;
 
     @Column(name = "country", nullable = false)
+    @NotNull
     private String country;
 
     public Address() {}

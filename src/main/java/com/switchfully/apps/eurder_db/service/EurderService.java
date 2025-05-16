@@ -1,7 +1,6 @@
 package com.switchfully.apps.eurder_db.service;
 
 import com.switchfully.apps.eurder_db.domain.*;
-import domain.*;
 import com.switchfully.apps.eurder_db.exception.InvalidInputException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

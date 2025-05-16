@@ -1,6 +1,9 @@
 package com.switchfully.apps.eurder_db.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Entity
 @Table(name = "item")
@@ -11,15 +14,18 @@ public class Item {
     private Long id;
 
     @Column(name = "name", nullable = false,unique = true)
+    @NotBlank
     private String name;
 
     @Column(name = "description")
     private String description;
 
     @Column(name = "price", nullable = false)
+    @Positive
     private double price;
 
     @Column(name = "stock", nullable = false)
+    @PositiveOrZero
     private int stock;
 
     public Item() {
