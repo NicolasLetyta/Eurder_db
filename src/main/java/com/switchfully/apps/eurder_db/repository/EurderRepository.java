@@ -10,10 +10,14 @@ import java.util.Optional;
 
 @Repository
 public interface EurderRepository extends JpaRepository<Eurder, Long> {
-    Optional<Eurder> findByMemberIdAndStatus(Long memberId, EurderStatus status);
+    Optional<Eurder> findByMemberIdAndStatusAndId(Long memberId, EurderStatus status, Long id);
 
     Optional<Eurder> findByIdAndMemberId(Long eurderId, Long memberId);
 
     List<Eurder> findAllByMemberIdAndStatus(Long memberId, EurderStatus status);
+
+    EurderStatus findStatusById(Long id);
+
+    boolean existsById(Long id);
 
 }

@@ -43,9 +43,9 @@ public class ItemService {
         return itemMapper.itemToOutput(itemRepository.save(item));
     }
 
-    public List<ItemDtoOutput> getItemOverView(String filter, String order) {
-        return null;
-    }
+//    public List<ItemDtoOutput> getItemOverView(String filter, String order) {
+//        return null;
+//    }
 
     private void validateItemInputUpdate(ItemDtoInput itemDtoInput, Long itemId) {
         validateArgumentWithBooleanCondition(itemId,"Item id cannot be null",

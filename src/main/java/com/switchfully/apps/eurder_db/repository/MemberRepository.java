@@ -14,4 +14,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findByMemberRole(MemberRole memberRole);
 
+    boolean existsByPhone(String phone);
 }

@@ -97,7 +97,7 @@ public class EurderRepositoryTest {
 
     @Test
     void givenCartExists_whenfindByMemberIdAndStatus_thenReturnCorrectEurderFromDatabase() {
-        Eurder result = eurderRepository.findByMemberIdAndStatus(customer1.getId(),EurderStatus.CART).orElse(null);
+        Eurder result = eurderRepository.findByMemberIdAndStatusAndId(customer1.getId(),EurderStatus.CART,cart1.getId()).orElse(null);
 
         assertThat(result).isEqualTo(cart1);
         assertThat(result.getStatus()).isEqualTo(cart2.getStatus());

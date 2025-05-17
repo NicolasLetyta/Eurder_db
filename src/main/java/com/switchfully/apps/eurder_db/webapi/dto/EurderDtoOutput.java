@@ -1,5 +1,7 @@
 package com.switchfully.apps.eurder_db.webapi.dto;
 
+import com.switchfully.apps.eurder_db.domain.EurderStatus;
+
 import java.util.List;
 
 public class EurderDtoOutput {
@@ -10,11 +12,11 @@ public class EurderDtoOutput {
     private List<ItemGroupDtoOutput> itemGroups;
     private double totalPrice;
 
-    public EurderDtoOutput(Long id, String memberName, Long memberId, String eurderStatus, List<ItemGroupDtoOutput> itemGroups, double totalPrice) {
+    public EurderDtoOutput(Long id, String memberName, Long memberId, EurderStatus eurderStatus, List<ItemGroupDtoOutput> itemGroups, double totalPrice) {
         this.id = id;
         this.memberName = memberName;
         this.memberId = memberId;
-        this.eurderStatus = eurderStatus;
+        this.eurderStatus = eurderStatus.toString();
         this.itemGroups = itemGroups;
         this.totalPrice = totalPrice;
     }
@@ -45,7 +47,7 @@ public class EurderDtoOutput {
 
     @Override
     public String toString() {
-        return this.id + " " + this.memberName + " " + this.eurderStatus + " " + this.totalPrice;
+        return this.id + " " + this.memberName + " " + this.eurderStatus +" "+ this.itemGroups + " " + this.totalPrice;
     }
     @Override
     public boolean equals(Object o) {

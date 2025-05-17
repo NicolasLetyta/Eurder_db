@@ -74,9 +74,11 @@ public class MemberService {
         validateArgument(memberDtoInput.getAddressInput(),"AddressInput cannot be null", Objects::isNull,InvalidInputException::new);
 
         validateArgument(memberDtoInput.getEmail(),"Invalid email format",e->!EmailValidator.getInstance().isValid(e),InvalidInputException::new);
-        validateArgument(memberDtoInput.getEmail(),"Email already in repository",e->memberRepository.existsByEmail(e),InvalidInputException::new);
-        validateArgument(memberDtoInput.getPhone(),"Invalid phoneNumber format",p->!p.matches(phoneRegex),InvalidInputException::new);
-
+        validateArgument(memberDtoInput.getEmail(),"Email already in repository", memberRepository::existsByEmail,InvalidInputException::new);
+        if(memberDtoInput.getPhone()!=null) {
+            validateArgument(memberDtoInput.getPhone(),"Invalid phoneNumber format",p->!p.matches(phoneRegex),InvalidInputException::new);
+            validateArgument(memberDtoInput.getPhone(),"Phone number already in repository", memberRepository::existsByPhone,InvalidInputException::new);
+        }
         return memberDtoInput;
     }
 
