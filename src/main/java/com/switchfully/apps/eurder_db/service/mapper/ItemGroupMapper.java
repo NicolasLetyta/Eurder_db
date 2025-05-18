@@ -3,6 +3,7 @@ package com.switchfully.apps.eurder_db.service.mapper;
 import com.switchfully.apps.eurder_db.domain.Eurder;
 import com.switchfully.apps.eurder_db.domain.Item;
 import com.switchfully.apps.eurder_db.domain.ItemGroup;
+import com.switchfully.apps.eurder_db.webapi.dto.ItemGroupDtoList;
 import org.springframework.stereotype.Component;
 import com.switchfully.apps.eurder_db.webapi.dto.ItemGroupDtoInput;
 import com.switchfully.apps.eurder_db.webapi.dto.ItemGroupDtoOutput;
@@ -36,12 +37,9 @@ public class ItemGroupMapper {
                 itemGroup.getEurder().getId());
     }
 
-    public ItemGroupDtoOutput itemGroupToDtoReport(ItemGroup itemGroup) {
-        return new ItemGroupDtoOutput(null,
-                itemGroup.getItem().getName(),
-                null,
+    public ItemGroupDtoList itemGroupToDtoList(ItemGroup itemGroup) {
+        return new ItemGroupDtoList(itemGroup.getItem().getName(),
                 itemGroup.getQuantity(),
-                itemGroup.getTotalPriceAtEurderDate(),
-                null);
+                itemGroup.getTotalPriceAtEurderDate());
     }
 }

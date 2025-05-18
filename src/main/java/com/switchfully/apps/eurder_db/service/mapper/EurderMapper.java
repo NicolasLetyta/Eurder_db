@@ -1,9 +1,8 @@
 package com.switchfully.apps.eurder_db.service.mapper;
 
 import com.switchfully.apps.eurder_db.domain.Eurder;
+import com.switchfully.apps.eurder_db.webapi.dto.*;
 import org.springframework.stereotype.Component;
-import com.switchfully.apps.eurder_db.webapi.dto.EurderDtoOutput;
-import com.switchfully.apps.eurder_db.webapi.dto.ItemGroupDtoOutput;
 
 import java.util.List;
 
@@ -39,19 +38,29 @@ public class EurderMapper {
                 eurder.calculateEurderPriceFinalized());
     }
 
-    public EurderDtoOutput eurderToDtoReport(Eurder eurder) {
-        List<ItemGroupDtoOutput> itemGroupsDtoFinalized = eurder.getItemGroups().stream()
-                .map(i->itemGroupMapper.itemGroupToDtoReport(i))
+    public EurderDtoList eurderToDtoList(Eurder eurder) {
+        List<ItemGroupDtoList> itemGroupsDtoList = eurder.getItemGroups().stream()
+                .map(i->itemGroupMapper.itemGroupToDtoList(i))
                 .toList();
-        double totalEurderPriceFinalized = itemGroupsDtoFinalized.stream()
-                .mapToDouble(ItemGroupDtoOutput::getSubtotalPrice)
+        double totalEurderPriceFinalized = itemGroupsDtoList.stream()
+                .mapToDouble(ItemGroupDtoList::getSubtotalPrice)
                 .sum();
-        return new EurderDtoOutput(eurder.getId(),
-                null,
-                null,
-                null,
-                itemGroupsDtoFinalized,
+
+        return new EurderDtoList(eurder.getId(),
+                itemGroupsDtoList,
                 totalEurderPriceFinalized);
+    }
+
+    public EurderDtoReport eurdersToDtoReport(List<Eurder> eurders) {
+        List<EurderDtoList> eurdersDtoList = eurders.stream()
+                .map(this::eurderToDtoList)
+                .toList();
+
+        double totalReportPrice = eurdersDtoList.stream()
+                .mapToDouble(EurderDtoList::getTotalPrice)
+                .sum();
+
+        return new EurderDtoReport(eurdersDtoList, totalReportPrice);
     }
 
 }
