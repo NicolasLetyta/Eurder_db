@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -127,13 +126,12 @@ public class EurderServiceTest {
         item2 = itemRepository.saveAndFlush(new Item("item2","this is item2",2.0,500));
         item3 = itemRepository.saveAndFlush(new Item("item3","this is item3",5.0,250));
 
-
         lastItemGroupId = ((Number) entityManager.createNativeQuery("SELECT nextval('item_group_seq')").getSingleResult()).longValue();
         lastEurderId = ((Number) entityManager.createNativeQuery("SELECT nextval('eurder_seq')").getSingleResult()).longValue();
     }
 
     @Test
-    void givenCustomerHasEurderCart_whenAddItemGroupToCart_thenReturnUpdatedEurderCartDto() {
+    void givenCustomerHasEurderCart_whenAddItemGroupToCart_thenReturnUpdatedEurderNewCartDto() {
         ItemGroupDtoInput input = new ItemGroupDtoInput(item1.getId(),99);
         ItemGroup itemGroupDomain = itemGroupMapper.inputToItemGroup(input,item1,cart1);
         itemGroupDomain.setShippingDate(LocalDate.now().minusDays(1));
@@ -141,9 +139,14 @@ public class EurderServiceTest {
 
         EurderDtoOutput expectedResult = getEurderDtoOutput(outputData, lastItemGroupId, EurderStatus.CART, customer1,cart1);
 
-        EurderDtoOutput result = eurderService.addItemGroupToCart(input,customer1,cart1.getId());
+        EurderDtoOutput result = eurderService.addItemGroupToNewCart(input,customer1);
 
-        assertThat(result).isEqualTo(expectedResult);
+        assertThat(result.getItemGroups().size()).isEqualTo(expectedResult.getItemGroups().size());
+        assertThat(result.getItemGroups().get(0).getItemName()).isEqualTo(expectedResult.getItemGroups().get(0).getItemName());
+        assertThat(result.getItemGroups().get(0).getItemDescription()).isEqualTo(expectedResult.getItemGroups().get(0).getItemDescription());
+
+        assertThat(result.getMemberName()).isEqualTo(expectedResult.getMemberName());
+        assertThat(result.getTotalPrice()).isEqualTo(expectedResult.getTotalPrice());
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.switchfully.apps.eurder_db.service;
 
 import com.switchfully.apps.eurder_db.domain.*;
 import com.switchfully.apps.eurder_db.exception.InvalidInputException;
+import com.switchfully.apps.eurder_db.webapi.dto.EurderDtoList;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.switchfully.apps.eurder_db.repository.EurderRepository;
@@ -36,13 +37,69 @@ public class EurderService {
         this.itemRepository = itemRepository;
     }
 
-    public EurderDtoOutput addItemGroupToCart(ItemGroupDtoInput itemGroupDtoInput, Member member, Long cartId) {
-        validateItemGroupInput(itemGroupDtoInput);
-        String fullName = member.getFullName();
-        Item item = itemRepository.findById(itemGroupDtoInput.getItemId()).get();
-        //either add itemgroup to existing cart eurder, or create a new eurder cart
-        Eurder cart = createOrGetCart(member.getId(),cartId);
+    //initialize an eurder by saving an eurder to the db with status CART
+    // not sure is this one is neede, if i want a new cart, i can just use add item group to new cart and use that id, if i create a cart i probably want to immediately add an itemgroup
 
+//    public EurderDtoOutput createCart(Member member) {
+//        Eurder cart = eurderRepository.save(new Eurder(member.getId()));
+//        return eurderMapper.eurderToOutputCart(cart, member.getFullName());
+//    }
+
+    public EurderDtoOutput addItemGroupToExistingCart(ItemGroupDtoInput itemGroupDtoInput, Member member, Long eurderId) {
+        Eurder cart = findEurderAndValidateOwnership(eurderId,member.getId());
+        validateArgument(cart,"The found order is not of type CART, cannot add itemgroup to order with status FINALIZED",c->c.getStatus()!=EurderStatus.CART,InvalidInputException::new);
+
+        return addItemGroupToCart(itemGroupDtoInput,member,cart);
+    }
+
+    public EurderDtoOutput addItemGroupToNewCart(ItemGroupDtoInput itemGroupDtoInput, Member member) {
+        //create a new cart and save to the repository
+        Eurder cart = eurderRepository.save(new Eurder(member.getId()));
+
+        return addItemGroupToCart(itemGroupDtoInput,member,cart);
+    }
+
+    public EurderDtoOutput placeEurder(Long eurderId, Member member) {
+        Eurder eurder = findEurderAndValidateOwnership(eurderId,member.getId());
+        return finalizeEurder(eurder,member.getFullName());
+    }
+
+    public EurderDtoReport createEurderReport(Member member) {
+        List<Eurder> eurdersFinalized = eurderRepository.findAllByMemberIdAndStatus(member.getId(), EurderStatus.FINALIZED);
+        if(eurdersFinalized.isEmpty()){
+            return null;
+        }else {
+            return eurderMapper.eurdersToDtoReport(eurdersFinalized);
+        }
+    }
+
+    //there has to be some way to see how many carts a user has...
+    //currently the tot price of a cart is 0 -> eurdermapper -> eurderToDtoList uses itemGroupDtoList.getSubtotalPrice = itemGroup.getTotalPriceAtEurderDate -> total price at eurder date is not set yet and thus is null
+    //this might also result in a nullPointerException... I will need another DTO -> CartOverViewDto :)
+    public List<EurderDtoList> getMemberCarts(Member member) {
+        List<Eurder> memberCartList = eurderRepository.findAllByMemberIdAndStatus(member.getId(), EurderStatus.CART);
+        validateArgument(memberCartList,"No eurders with status CART found for member "+member, List::isEmpty,InvalidInputException::new);
+
+        return memberCartList.stream()
+                .map(eurderMapper::eurderToDtoList)
+                .collect(Collectors.toList());
+    }
+
+    public EurderDtoOutput placeReEurder(Long eurderId, Member member) {
+        Eurder oldEurder = findEurderAndValidateOwnership(eurderId,member.getId());
+        validateArgument(oldEurder,"Eurder not finalized yet, cannot re-order until finalized",e->!e.getStatus().equals(EurderStatus.FINALIZED),InvalidInputException::new);
+        Eurder newEurder = new Eurder(member.getId());
+
+        oldEurder.getItemGroups().forEach(i->{
+            ItemGroup newItemGroup = new ItemGroup(i.getQuantity(), i.getItem(), newEurder);
+            newEurder.addItemGroup(newItemGroup);
+        });
+        return finalizeEurder(newEurder,member.getFullName());
+    }
+
+    private EurderDtoOutput addItemGroupToCart(ItemGroupDtoInput itemGroupDtoInput, Member member, Eurder cart) {
+        validateItemGroupInput(itemGroupDtoInput);
+        Item item = itemRepository.findById(itemGroupDtoInput.getItemId()).get();
         ItemGroup itemGroup = itemGroupMapper.inputToItemGroup(itemGroupDtoInput,
                 item,
                 cart);
@@ -52,34 +109,7 @@ public class EurderService {
 
         cart.addItemGroup(itemGroup);
         cart = eurderRepository.save(cart);
-        return eurderMapper.eurderToOutputCart(cart,fullName);
-    }
-
-    public EurderDtoOutput placeEurder(Long eurderId, Member member) {
-        Eurder eurder = validateEurderIdMember(eurderId,member);
-        return finalizeEurder(eurder,member.getFullName());
-    }
-
-    public EurderDtoReport createEurderReport(Member member) {
-        List<Eurder> eurdersFinalized = eurderRepository.findAllByMemberIdAndStatus(member.getId(), EurderStatus.FINALIZED);
-
-        if(eurdersFinalized.isEmpty()){
-            return null;
-        }else {
-            return eurderMapper.eurdersToDtoReport(eurdersFinalized);
-        }
-    }
-
-    public EurderDtoOutput placeReEurder(Long eurderId, Member member) {
-        Eurder oldEurder = validateEurderIdMember(eurderId,member);
-        validateArgument(oldEurder,"Eurder not finalized yet, cannot re-order until finalized",e->!e.getStatus().equals(EurderStatus.FINALIZED),InvalidInputException::new);
-        Eurder newEurder = new Eurder(member.getId());
-
-        oldEurder.getItemGroups().forEach(i->{
-            ItemGroup newItemGroup = new ItemGroup(i.getQuantity(), i.getItem(), newEurder);
-            newEurder.addItemGroup(newItemGroup);
-        });
-        return finalizeEurder(newEurder,member.getFullName());
+        return eurderMapper.eurderToOutputCart(cart,member.getFullName());
     }
 
     private EurderDtoOutput finalizeEurder(Eurder eurder, String memberName) {
@@ -105,21 +135,14 @@ public class EurderService {
         return eurderMapper.eurderToOutputFinalized(eurderRepository.save(eurder),memberName);
     }
 
-    private Eurder validateEurderIdMember(Long eurderId, Member member) {
-        Eurder eurder = eurderRepository.findById(eurderId).orElseThrow(() -> new InvalidInputException("Eurder not found in repository"));
-        validateArgument(eurder,"Eurder does not belong to this member",e->!e.getMemberId().equals(member.getId()),InvalidInputException::new);
-        return eurder;
-    }
-
     private void validateItemGroupInput(ItemGroupDtoInput itemGroupDtoInput) {
         validateArgument(itemGroupDtoInput.getItemId(),"Item id not found in repository", i->!itemRepository.existsById(i),InvalidInputException::new);
         validateArgument(itemGroupDtoInput.getQuantity(),"Order quantity must be larger than 0", q->q<=0,InvalidInputException::new);
     }
 
-
-    private Eurder createOrGetCart(Long memberId, Long cartId) {
-        Optional<Eurder> cart = eurderRepository.findByMemberIdAndStatusAndId(memberId, EurderStatus.CART,cartId);
-        return cart.orElseGet(() -> eurderRepository.save(new Eurder(memberId)));
+    private Eurder findEurderAndValidateOwnership(Long eurderId, Long memberId) {
+        Eurder eurder = eurderRepository.findById(eurderId).orElseThrow(() -> new InvalidInputException("Order id not found, please enter a valid order id"));
+        return validateArgument(eurder,"This order does not belong to the privided user id",e->!eurder.getMemberId().equals(memberId),InvalidInputException::new);
     }
 
     private LocalDate calculateShippingDate(Item item, int orderQuantity, LocalDate dateOfFinalization) {
