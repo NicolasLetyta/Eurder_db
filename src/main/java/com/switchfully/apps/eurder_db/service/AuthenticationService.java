@@ -59,7 +59,6 @@ public class AuthenticationService {
                 InvalidHeaderException::new);
 
         return member;
-        //this comment is here so we can commit this file, ignore
     }
 }
 
