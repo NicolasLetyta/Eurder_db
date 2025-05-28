@@ -252,7 +252,7 @@ public class EurderServiceTest {
         eurderRepository.save(cart1);
         EurderDtoOutput result = eurderService.placeReEurder(cart1.getId(),customer1);
 
-        assertThat(result.getEurderStatus()).isEqualTo(EurderStatus.FINALIZED.toString());
+        assertThat(result.getEurderStatus()).isEqualTo(EurderStatus.FINALIZED);
         assertThat(result).isEqualTo(expectedResult);
     }
 

@@ -42,6 +42,7 @@ public class EurderController {
     }
 
     @PutMapping(path = "/{eurderId}", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public EurderDtoOutput placeEurder(@RequestHeader(value = "Authorization") String AuthToken,
                                        @PathVariable Long eurderId) {
         Member customer = authenticationService.authenticateMember(AuthToken);

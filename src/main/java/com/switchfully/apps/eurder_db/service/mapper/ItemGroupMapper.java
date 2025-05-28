@@ -37,9 +37,15 @@ public class ItemGroupMapper {
                 itemGroup.getEurder().getId());
     }
 
-    public ItemGroupDtoList itemGroupToDtoList(ItemGroup itemGroup) {
+    public ItemGroupDtoList itemGroupToDtoListFinalized(ItemGroup itemGroup) {
         return new ItemGroupDtoList(itemGroup.getItem().getName(),
                 itemGroup.getQuantity(),
                 itemGroup.getTotalPriceAtEurderDate());
+    }
+
+    public ItemGroupDtoList itemGroupToDtoListCart(ItemGroup itemGroup) {
+        return new ItemGroupDtoList(itemGroup.getItem().getName(),
+                itemGroup.getQuantity(),
+                itemGroup.calculateCurrentSubtotalPrice());
     }
 }

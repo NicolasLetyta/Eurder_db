@@ -38,9 +38,9 @@ public class EurderMapper {
                 eurder.calculateEurderPriceFinalized());
     }
 
-    public EurderDtoList eurderToDtoList(Eurder eurder) {
+    public EurderDtoList eurderToDtoListFinalized(Eurder eurder) {
         List<ItemGroupDtoList> itemGroupsDtoList = eurder.getItemGroups().stream()
-                .map(i->itemGroupMapper.itemGroupToDtoList(i))
+                .map(i->itemGroupMapper.itemGroupToDtoListFinalized(i))
                 .toList();
         double totalEurderPriceFinalized = itemGroupsDtoList.stream()
                 .mapToDouble(ItemGroupDtoList::getSubtotalPrice)
@@ -51,9 +51,23 @@ public class EurderMapper {
                 totalEurderPriceFinalized);
     }
 
+    public EurderDtoList eurderToDtoListCart(Eurder eurder) {
+        List<ItemGroupDtoList> itemGroupsDtoList = eurder.getItemGroups().stream()
+                .map(itemGroupMapper::itemGroupToDtoListCart)
+                .toList();
+
+        double totalEurderPriceCart = itemGroupsDtoList.stream()
+                .mapToDouble(ItemGroupDtoList::getSubtotalPrice)
+                .sum();
+
+        return new EurderDtoList(eurder.getId(),
+                itemGroupsDtoList,
+                totalEurderPriceCart);
+    }
+
     public EurderDtoReport eurdersToDtoReport(List<Eurder> eurders) {
         List<EurderDtoList> eurdersDtoList = eurders.stream()
-                .map(this::eurderToDtoList)
+                .map(this::eurderToDtoListFinalized)
                 .toList();
 
         double totalReportPrice = eurdersDtoList.stream()

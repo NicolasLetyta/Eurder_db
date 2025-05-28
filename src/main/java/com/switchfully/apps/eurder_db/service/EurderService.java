@@ -15,7 +15,6 @@ import com.switchfully.apps.eurder_db.webapi.dto.ItemGroupDtoInput;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.switchfully.apps.eurder_db.utility.Validation.validateArgument;
@@ -81,7 +80,7 @@ public class EurderService {
         validateArgument(memberCartList,"No eurders with status CART found for member "+member, List::isEmpty,InvalidInputException::new);
 
         return memberCartList.stream()
-                .map(eurderMapper::eurderToDtoList)
+                .map(eurderMapper::eurderToDtoListCart)
                 .collect(Collectors.toList());
     }
 

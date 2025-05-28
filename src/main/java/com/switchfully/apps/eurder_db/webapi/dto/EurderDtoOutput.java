@@ -8,7 +8,7 @@ public class EurderDtoOutput {
     private Long id;
     private String memberName;
     private Long memberId;
-    private String eurderStatus;
+    private EurderStatus eurderStatus;
     private List<ItemGroupDtoOutput> itemGroups;
     private double totalPrice;
 
@@ -16,7 +16,7 @@ public class EurderDtoOutput {
         this.id = id;
         this.memberName = memberName;
         this.memberId = memberId;
-        this.eurderStatus = eurderStatus.toString();
+        this.eurderStatus = eurderStatus;
         this.itemGroups = itemGroups;
         this.totalPrice = totalPrice;
     }
@@ -33,7 +33,7 @@ public class EurderDtoOutput {
         return memberId;
     }
 
-    public String getEurderStatus() {
+    public EurderStatus getEurderStatus() {
         return eurderStatus;
     }
 
